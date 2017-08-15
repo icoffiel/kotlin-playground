@@ -1,5 +1,6 @@
 package com.nerdery.kotlin.playground.nat.xbox.manufacturer
 
+import com.nerdery.kotlin.playground.nat.xbox.exceptions.NotFoundException
 import org.springframework.stereotype.Service
 import javax.inject.Inject
 
@@ -8,5 +9,17 @@ class ManufacturerService @Inject constructor(val manufacturerRepository: Manufa
 
     fun listAll(): MutableIterable<Manufacturer> = manufacturerRepository.findAll()
 
+    fun getOne(id: Long): Manufacturer = manufacturerRepository.findOne(id)
+
     fun  save(manufacturer: Manufacturer): Manufacturer = manufacturerRepository.save(manufacturer)
+
+    fun update(id: Long, manufacturer: Manufacturer): Manufacturer {
+        if (manufacturerRepository.findOne(id) == null) {
+            throw NotFoundException(id, Manufacturer::class)
+        }
+
+        return manufacturerRepository.save(manufacturer.copy(id = id))
+    }
+
+    fun delete(id:Long): Unit = manufacturerRepository.delete(id)
 }
