@@ -1,12 +1,12 @@
 package com.nerdery.kotlin.playground.nat.xbox.manufacturer
 
-import com.nerdery.kotlin.playground.nat.xbox.constants.UrlConstants
+import com.nerdery.kotlin.playground.nat.xbox.constants.API_BASE
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import javax.inject.Inject
 
 @RestController
-@RequestMapping("${UrlConstants.API_BASE}/manufacturer")
+@RequestMapping("$API_BASE/manufacturer")
 class ManufacturerController @Inject constructor(val manufacturerService: ManufacturerService) {
 
     @GetMapping

@@ -1,5 +1,6 @@
 package com.nerdery.kotlin.playground.nat.xbox.manufacturer
 
+import com.nerdery.kotlin.playground.nat.xbox.constants.API_BASE
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.BDDMockito.doNothing
@@ -24,6 +25,7 @@ class ManufacturerControllerUnitTest {
     @MockBean
     lateinit private var manufacturerService: ManufacturerService
 
+    private val MANUFACTURER_URL = "$API_BASE/manufacturer"
     private val testManufacturer = Manufacturer(1, "Manufacturer Name")
 
     @Test
@@ -31,7 +33,7 @@ class ManufacturerControllerUnitTest {
         given(manufacturerService.listAll())
                 .willReturn((mutableListOf(testManufacturer)))
 
-        mvc.perform(get("/api/manufacturer"))
+        mvc.perform(get(MANUFACTURER_URL))
                 .andExpect(status().isOk)
                 .andExpect(content().json("""
                     [
@@ -48,7 +50,7 @@ class ManufacturerControllerUnitTest {
         given(manufacturerService.getOne(1))
                 .willReturn(testManufacturer)
 
-        mvc.perform(get("/api/manufacturer/1"))
+        mvc.perform(get("$MANUFACTURER_URL/${testManufacturer.id}"))
                 .andExpect(status().isOk)
                 .andExpect(content().json("""
                     {
@@ -64,7 +66,7 @@ class ManufacturerControllerUnitTest {
                 .willReturn(testManufacturer)
 
         mvc.perform(
-            post("/api/manufacturer")
+            post(MANUFACTURER_URL)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .content("""
                         {
@@ -86,7 +88,7 @@ class ManufacturerControllerUnitTest {
                 .willReturn(testManufacturer)
 
         mvc.perform(
-            put("/api/manufacturer/1")
+            put("$MANUFACTURER_URL/${testManufacturer.id}")
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .content("""
                         {
@@ -106,7 +108,7 @@ class ManufacturerControllerUnitTest {
     fun delete() {
         doNothing().`when`(manufacturerService).delete(1)
 
-        mvc.perform(delete("/api/manufacturer/1"))
+        mvc.perform(delete("$MANUFACTURER_URL/${testManufacturer.id}"))
                 .andExpect(status().isOk)
                 .andExpect(content().string(""))
     }
