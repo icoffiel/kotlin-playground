@@ -60,7 +60,7 @@ class ManufacturerControllerUnitTest {
 
     @Test
     fun save() {
-        given(manufacturerService.save(Manufacturer(null, "Manufacturer Name")))
+        given(manufacturerService.save(Manufacturer(name = "Manufacturer Name")))
                 .willReturn(testManufacturer)
 
         mvc.perform(
@@ -82,7 +82,7 @@ class ManufacturerControllerUnitTest {
 
     @Test
     fun update() {
-        given(manufacturerService.update(1, Manufacturer(null, "Manufacturer Name")))
+        given(manufacturerService.update(1, Manufacturer(name = "Manufacturer Name")))
                 .willReturn(testManufacturer)
 
         mvc.perform(

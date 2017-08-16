@@ -9,6 +9,6 @@ import javax.persistence.Id
 data class Manufacturer (
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
-        val id: Long?,
+        val id: Long? = null,
         val name: String
 )
