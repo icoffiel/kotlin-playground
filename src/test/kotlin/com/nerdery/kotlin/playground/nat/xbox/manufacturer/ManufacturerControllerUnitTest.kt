@@ -25,7 +25,7 @@ class ManufacturerControllerUnitTest {
     @MockBean
     lateinit private var manufacturerService: ManufacturerService
 
-    private val MANUFACTURER_URL = "$API_BASE/manufacturer"
+    private val MANUFACTURER_URL = "$API_BASE/manufacturers"
     private val testManufacturer = Manufacturer(1, "Manufacturer Name")
 
     @Test

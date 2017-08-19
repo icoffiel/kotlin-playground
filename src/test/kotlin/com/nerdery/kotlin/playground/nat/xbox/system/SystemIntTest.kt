@@ -1,9 +1,9 @@
-package com.nerdery.kotlin.playground.nat.xbox.manufacturer
+package com.nerdery.kotlin.playground.nat.xbox.system
 
 import com.nerdery.kotlin.playground.KotlinPlaygroundApplication
-import com.nerdery.kotlin.playground.nat.xbox.constants.API_BASE
 import com.nerdery.kotlin.playground.util.TestUtil
 import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.notNullValue
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(classes = arrayOf(KotlinPlaygroundApplication::class), webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class ManufacturerIntTest {
+class SystemIntTest {
 
     lateinit private var mockMvc: MockMvc
 
@@ -32,33 +32,34 @@ class ManufacturerIntTest {
     lateinit private var jacksonMessageConverter: MappingJackson2HttpMessageConverter
 
     @Inject
-    lateinit private var manufacturerController: ManufacturerController
+    lateinit private var systemController: SystemController
 
     @Inject
-    lateinit private var manufacturerRepository: ManufacturerRepository
+    lateinit private var systemRepository: SystemRepository
 
-    private val MANUFACTURER_URL = "$API_BASE/manufacturers"
+    lateinit private var testSystem: System
+
+    private val SYSTEM_URL = "/api/systems"
     private val UNKNOWN_ID = 999
-    lateinit private var testManufacturer: Manufacturer
 
     @Before
     fun beforeEach() {
-        mockMvc = MockMvcBuilders.standaloneSetup(manufacturerController)
+        mockMvc = MockMvcBuilders.standaloneSetup(systemController)
                 .setMessageConverters(jacksonMessageConverter)
                 .alwaysDo<StandaloneMockMvcBuilder>(MockMvcResultHandlers.print())
                 .build()
-        testManufacturer = manufacturerRepository.save(Manufacturer(name = "Test Manufacturer"))
+        testSystem = systemRepository.save(System(name = "Test System"))
     }
 
     @After
     fun afterEach() {
-        manufacturerRepository.deleteAll()
+        systemRepository.deleteAll()
     }
 
     @Test
     fun listAllSuccess() {
         mockMvc.perform(
-                get(MANUFACTURER_URL)
+                get(SYSTEM_URL)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.length()", `is`(1)))
@@ -67,71 +68,84 @@ class ManufacturerIntTest {
     @Test
     fun listOneSuccess() {
         mockMvc.perform(
-                get("$MANUFACTURER_URL/${testManufacturer.id}")
+                get("$SYSTEM_URL/${testSystem.id}")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk)
-                .andExpect(jsonPath("$.id", `is`(testManufacturer.id?.toInt())))
-                .andExpect(jsonPath("$.name", `is`(testManufacturer.name)))
+                .andExpect(jsonPath("$.id", `is`(testSystem.id?.toInt())))
+                .andExpect(jsonPath("$.name", `is`(testSystem.name)))
     }
 
     @Test
     fun listOneNotFound() {
         mockMvc.perform(
-                get("$MANUFACTURER_URL/$UNKNOWN_ID")
+                get("$SYSTEM_URL/$UNKNOWN_ID")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isNotFound)
     }
 
     @Test
     fun saveSuccess() {
-        val newManufacturer = Manufacturer(name = "New Manufacturer")
+        val newSystem = System(name = "New System")
 
-        val countBefore = manufacturerRepository.findAll().toList().size
+        val beforeCount = systemRepository.findAll().toList().size
         mockMvc.perform(
-                post(MANUFACTURER_URL)
+                post(SYSTEM_URL)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(TestUtil.convertObjectToJson(newManufacturer)))
+                        .content(TestUtil.convertObjectToJson(newSystem)))
                 .andExpect(status().isCreated)
-                .andExpect(jsonPath("$.name", `is`(newManufacturer.name)))
-        val countAfter = manufacturerRepository.findAll().toList().size
+                .andExpect(jsonPath("$.id", notNullValue()))
+                .andExpect(jsonPath("$.name", `is`(newSystem.name)))
+        val afterCount = systemRepository.findAll().toList().size
 
-
-        assertEquals(countBefore + 1, countAfter)
+        assertEquals(beforeCount + 1, afterCount)
     }
 
     @Test
     fun updateSuccess() {
-        val updatedManufacturer = Manufacturer(name = "Updated Manufacturer")
+        val updatedSystem = testSystem.copy(name = "Updated System")
 
         mockMvc.perform(
-                put("$MANUFACTURER_URL/${testManufacturer.id}")
+                put("$SYSTEM_URL/${testSystem.id}")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(TestUtil.convertObjectToJson(updatedManufacturer)))
+                        .content(TestUtil.convertObjectToJson(updatedSystem)))
                 .andExpect(status().isOk)
-                .andExpect(jsonPath("$.id", `is`(testManufacturer.id?.toInt())))
-                .andExpect(jsonPath("$.name", `is`(updatedManufacturer.name)))
+                .andExpect(jsonPath("$.id", `is`(updatedSystem.id?.toInt())))
+                .andExpect(jsonPath("$.name", `is`(updatedSystem.name)))
     }
 
     @Test
     fun updateNotFound() {
-        val updatedManufacturer = Manufacturer(name = "Updated Manufacturer")
+        val updatedSystem = testSystem.copy(name = "Updated System")
 
         mockMvc.perform(
-                put("$MANUFACTURER_URL/$UNKNOWN_ID")
+                put("$SYSTEM_URL/$UNKNOWN_ID")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(TestUtil.convertObjectToJson(updatedManufacturer)))
+                        .content(TestUtil.convertObjectToJson(updatedSystem)))
                 .andExpect(status().isNotFound)
     }
 
     @Test
     fun deleteSuccess() {
-        val countBefore = manufacturerRepository.findAll().toList().size
+        val countBefore = systemRepository.findAll().toList().size
         mockMvc.perform(
-                delete("$MANUFACTURER_URL/${testManufacturer.id}")
+                delete("$SYSTEM_URL/${testSystem.id}")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk)
-        val countAfter = manufacturerRepository.findAll().toList().size
+        val countAfter = systemRepository.findAll().toList().size
 
         assertEquals(countBefore - 1, countAfter)
+    }
+
+    @Test
+    fun deleteNotFound() {
+        val countBefore = systemRepository.findAll().toList().size
+        mockMvc.perform(
+                delete("$SYSTEM_URL/$UNKNOWN_ID")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNotFound)
+        val countAfter = systemRepository.findAll().toList().size
+
+        assertEquals(countBefore, countAfter)
+
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*
 import javax.inject.Inject
 
 @RestController
-@RequestMapping("$API_BASE/manufacturer")
+@RequestMapping("$API_BASE/manufacturers")
 class ManufacturerController @Inject constructor(val manufacturerService: ManufacturerService) {
 
     @GetMapping
