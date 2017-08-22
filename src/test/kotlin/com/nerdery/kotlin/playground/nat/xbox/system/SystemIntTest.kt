@@ -1,7 +1,8 @@
 package com.nerdery.kotlin.playground.nat.xbox.system
 
 import com.nerdery.kotlin.playground.KotlinPlaygroundApplication
-import com.nerdery.kotlin.playground.util.TestUtil
+import com.nerdery.kotlin.playground.nat.xbox.manufacturer.Manufacturer
+import com.nerdery.kotlin.playground.nat.xbox.manufacturer.ManufacturerRepository
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.notNullValue
 import org.junit.After
@@ -37,6 +38,10 @@ class SystemIntTest {
     @Inject
     lateinit private var systemRepository: SystemRepository
 
+    @Inject
+    lateinit private var manufacturerRepository: ManufacturerRepository
+
+    lateinit private var testManufacturer: Manufacturer
     lateinit private var testSystem: System
 
     private val SYSTEM_URL = "/api/systems"
@@ -48,7 +53,9 @@ class SystemIntTest {
                 .setMessageConverters(jacksonMessageConverter)
                 .alwaysDo<StandaloneMockMvcBuilder>(MockMvcResultHandlers.print())
                 .build()
-        testSystem = systemRepository.save(System(name = "Test System"))
+
+        testManufacturer = manufacturerRepository.save(Manufacturer(name = "Test Manufacturer"))
+        testSystem = systemRepository.save(System(name = "Test System", manufacturerId = testManufacturer.id!!))
     }
 
     @After
@@ -71,8 +78,9 @@ class SystemIntTest {
                 get("$SYSTEM_URL/${testSystem.id}")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk)
-                .andExpect(jsonPath("$.id", `is`(testSystem.id?.toInt())))
-                .andExpect(jsonPath("$.name", `is`(testSystem.name)))
+                .andExpect(jsonPath("$.system.id", `is`(testSystem.id?.toInt())))
+                .andExpect(jsonPath("$.system.name", `is`(testSystem.name)))
+                .andExpect(jsonPath("$.manufacturerId", `is`(testManufacturer.id!!.toInt())))
     }
 
     @Test
@@ -85,42 +93,84 @@ class SystemIntTest {
 
     @Test
     fun saveSuccess() {
-        val newSystem = System(name = "New System")
+        val name = "New System"
+        val JSON = """
+            {
+                "manufacturerId": ${testManufacturer.id},
+                "system": {
+                    "name": "$name"
+                }
+            }
+        """.trimIndent()
 
         val beforeCount = systemRepository.findAll().toList().size
         mockMvc.perform(
                 post(SYSTEM_URL)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(TestUtil.convertObjectToJson(newSystem)))
+                        .content(JSON))
                 .andExpect(status().isCreated)
-                .andExpect(jsonPath("$.id", notNullValue()))
-                .andExpect(jsonPath("$.name", `is`(newSystem.name)))
+                .andExpect(jsonPath("$.manufacturerId", `is`(testManufacturer.id!!.toInt())))
+                .andExpect(jsonPath("$.system.id", notNullValue()))
+                .andExpect(jsonPath("$.system.name", `is`(name)))
         val afterCount = systemRepository.findAll().toList().size
 
         assertEquals(beforeCount + 1, afterCount)
     }
 
     @Test
+    fun saveSystemFailure() {
+        val JSON = """
+            {
+                "system": {
+                    "name": "Test System"
+                }
+            }
+        """.trimIndent()
+
+        mockMvc.perform(
+                post(SYSTEM_URL)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(JSON))
+                .andExpect(status().isBadRequest)
+    }
+
+    @Test
     fun updateSuccess() {
-        val updatedSystem = testSystem.copy(name = "Updated System")
+        val name = "Updated System"
+        val JSON = """
+            {
+                "manufacturerId": ${testManufacturer.id},
+                "system": {
+                    "name": "$name"
+                }
+            }
+        """.trimIndent()
 
         mockMvc.perform(
                 put("$SYSTEM_URL/${testSystem.id}")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(TestUtil.convertObjectToJson(updatedSystem)))
+                        .content(JSON))
                 .andExpect(status().isOk)
-                .andExpect(jsonPath("$.id", `is`(updatedSystem.id?.toInt())))
-                .andExpect(jsonPath("$.name", `is`(updatedSystem.name)))
+                .andExpect(jsonPath("$.manufacturerId", `is`(testManufacturer.id!!.toInt())))
+                .andExpect(jsonPath("$.system.id", `is`(testSystem.id!!.toInt())))
+                .andExpect(jsonPath("$.system.name", `is`(name)))
     }
 
     @Test
     fun updateNotFound() {
-        val updatedSystem = testSystem.copy(name = "Updated System")
+        val JSON = """
+            {
+                "manufacturerId": ${testManufacturer.id},
+                "system": {
+                    "name": "Updated System"
+                }
+            }
+        """.trimIndent()
 
         mockMvc.perform(
                 put("$SYSTEM_URL/$UNKNOWN_ID")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(TestUtil.convertObjectToJson(updatedSystem)))
+                        .content(JSON))
                 .andExpect(status().isNotFound)
     }
 

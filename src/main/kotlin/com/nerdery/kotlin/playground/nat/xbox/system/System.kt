@@ -10,5 +10,6 @@ data class System(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
         val id: Long? = null,
-        val name:String
+        val name: String,
+        val manufacturerId: Long
 )
