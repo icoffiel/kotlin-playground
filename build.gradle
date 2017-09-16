@@ -4,6 +4,8 @@ buildscript {
 		springBootVersion = '1.5.6.RELEASE'
 		javaxVersion = '1'
 		jacksonKotlinModuleVersion = '2.9.0'
+		graphqlVersion = '3.6.0'
+        graphqlToolsVersion = '4.0.1'
 	}
 	repositories {
 		mavenCentral()
@@ -50,6 +52,10 @@ dependencies {
 	compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
 	compile("javax.inject:javax.inject:${javaxVersion}") // Ability to use @Inject
 	compile("com.fasterxml.jackson.module:jackson-module-kotlin:${jacksonKotlinModuleVersion}") // Needed for JSON deserialization
+
+	compile("com.graphql-java:graphql-spring-boot-starter:${graphqlVersion}") // GraphQL
+	compile("com.graphql-java:graphiql-spring-boot-starter:${graphqlVersion}") // to embed GraphiQL tool
+    compile("com.graphql-java:graphql-java-tools:${graphqlToolsVersion}") // Java GraphQL tools
 
 
 	runtime('org.springframework.boot:spring-boot-devtools')

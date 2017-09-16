@@ -1,0 +1,39 @@
+type Query {
+  # If episode omitted then return the hero of the whole saga
+  hero(episode: Episode): [Character]!
+  # Find humans, returns single if id is provided
+  humans(id: String): [Human]!
+  # Find droids, returns single if id is provided
+  droids(is: String): [Droid]!
+  # Find character by id
+  # character(id: String!): Character
+}
+
+# Films in the series
+enum Episode {
+  A_NEW_HOPE,
+  EMPIRE_STRIKES_BACK,
+  RETURN_OF_THE_JEDI
+}
+
+# Interface representing a character
+interface Character {
+  id: String!
+  name: String
+  appearsIn: [Episode]
+}
+
+# Human implementation
+type Human implements Character {
+  id: String!
+  name: String
+  appearsIn: [Episode]
+  homePlanet: String
+}
+
+type Droid implements Character {
+  id: String!
+  name: String
+  appearsIn: [Episode]
+  primaryFunction: String
+}
