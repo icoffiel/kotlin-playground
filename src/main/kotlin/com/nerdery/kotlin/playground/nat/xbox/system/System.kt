@@ -12,4 +12,8 @@ data class System(
         val id: Long? = null,
         val name: String,
         val manufacturerId: Long
-)
+) {
+    companion object {
+        val ExceptionName = "System"
+    }
+}

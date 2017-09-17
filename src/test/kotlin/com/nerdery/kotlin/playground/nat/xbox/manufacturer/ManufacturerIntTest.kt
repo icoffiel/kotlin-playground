@@ -2,6 +2,7 @@ package com.nerdery.kotlin.playground.nat.xbox.manufacturer
 
 import com.nerdery.kotlin.playground.KotlinPlaygroundApplication
 import com.nerdery.kotlin.playground.nat.xbox.constants.API_BASE
+import com.nerdery.kotlin.playground.nat.xbox.exceptions.handlers.RestExceptionHandler
 import com.nerdery.kotlin.playground.util.TestUtil
 import org.hamcrest.Matchers.`is`
 import org.junit.After
@@ -45,6 +46,7 @@ class ManufacturerIntTest {
     fun beforeEach() {
         mockMvc = MockMvcBuilders.standaloneSetup(manufacturerController)
                 .setMessageConverters(jacksonMessageConverter)
+                .setControllerAdvice(RestExceptionHandler())
                 .alwaysDo<StandaloneMockMvcBuilder>(MockMvcResultHandlers.print())
                 .build()
         testManufacturer = manufacturerRepository.save(Manufacturer(name = "Test Manufacturer"))

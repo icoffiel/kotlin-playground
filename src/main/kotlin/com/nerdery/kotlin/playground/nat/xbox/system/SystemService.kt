@@ -17,20 +17,20 @@ class SystemService @Inject constructor(
                     .findAll()
                     .toList()
 
-    fun getOne(id: Long): System = systemRepository.findOne(id) ?: throw NotFoundException(id, System::class.simpleName)
+    fun getOne(id: Long): System = systemRepository.findOne(id) ?: throw NotFoundException(id, System.ExceptionName)
 
     fun save(system: System): System = when {
         manufacturerRepository.findOne(system.manufacturerId) != null -> systemRepository.save(system)
-        else -> throw NotFoundException(system.manufacturerId, Manufacturer::class.simpleName)
+        else -> throw NotFoundException(system.manufacturerId, Manufacturer.ExceptionName)
     }
 
     fun update(id: Long, system: System): System = when {
         systemRepository.findOne(id) != null -> systemRepository.save(system.copy(id = id))
-        else -> throw NotFoundException(id, System::class.simpleName)
+        else -> throw NotFoundException(id, System.ExceptionName)
     }
 
     fun delete(id: Long) = when {
         systemRepository.findOne(id) != null -> systemRepository.delete(id)
-        else -> throw NotFoundException(id, System::class.simpleName)
+        else -> throw NotFoundException(id, System.ExceptionName)
     }
 }

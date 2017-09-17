@@ -1,6 +1,7 @@
 package com.nerdery.kotlin.playground.nat.xbox.system
 
 import com.nerdery.kotlin.playground.KotlinPlaygroundApplication
+import com.nerdery.kotlin.playground.nat.xbox.exceptions.handlers.RestExceptionHandler
 import com.nerdery.kotlin.playground.nat.xbox.manufacturer.Manufacturer
 import com.nerdery.kotlin.playground.nat.xbox.manufacturer.ManufacturerRepository
 import org.hamcrest.Matchers.`is`
@@ -51,6 +52,7 @@ class SystemIntTest {
     fun beforeEach() {
         mockMvc = MockMvcBuilders.standaloneSetup(systemController)
                 .setMessageConverters(jacksonMessageConverter)
+                .setControllerAdvice(RestExceptionHandler())
                 .alwaysDo<StandaloneMockMvcBuilder>(MockMvcResultHandlers.print())
                 .build()
 

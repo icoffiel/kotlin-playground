@@ -9,17 +9,17 @@ class ManufacturerService @Inject constructor(val manufacturerRepository: Manufa
 
     fun listAll(): MutableIterable<Manufacturer> = manufacturerRepository.findAll()
 
-    fun getOne(id: Long): Manufacturer = manufacturerRepository.findOne(id) ?: throw NotFoundException(id, Manufacturer::class.simpleName)
+    fun getOne(id: Long): Manufacturer = manufacturerRepository.findOne(id) ?: throw NotFoundException(id, Manufacturer.ExceptionName)
 
     fun save(manufacturer: Manufacturer): Manufacturer = manufacturerRepository.save(manufacturer)
 
     fun update(id: Long, manufacturer: Manufacturer): Manufacturer {
         if (manufacturerRepository.findOne(id) == null) {
-            throw NotFoundException(id, Manufacturer::class.simpleName)
+            throw NotFoundException(id, Manufacturer.ExceptionName)
         }
 
         return manufacturerRepository.save(manufacturer.copy(id = id))
     }
 
-    fun delete(id: Long): Unit = manufacturerRepository.delete(id)
+    fun delete(id: Long) = manufacturerRepository.delete(id)
 }
