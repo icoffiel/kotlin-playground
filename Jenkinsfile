@@ -11,6 +11,9 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing..'
+                echo 'Change gradle permissions'
+                sh 'chmod 755 gradlew'
+                echo 'Run Tests'
                 sh './gradlew clean test'
             }
         }
