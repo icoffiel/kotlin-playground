@@ -5,7 +5,8 @@ import javax.validation.constraints.NotNull
 
 /**
  * @property manufacturerId is set to a `Long?` as this maps to the primitive `long` in Java and primitives cannot be null.
- * When deserializing this property is therefore set to 0 which is not ideal for validation, therefore we mark [manufacturerId] as being potentially null in order to correctly validate.
+ * When deserializing this property is therefore set to 0 which is not ideal for validation, therefore we
+ * mark [manufacturerId] as being potentially null in order to correctly validate.
  */
 data class SystemRequest(
         @field:NotNull val manufacturerId: Long?,

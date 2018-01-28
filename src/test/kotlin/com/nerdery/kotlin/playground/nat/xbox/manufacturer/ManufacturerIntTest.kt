@@ -27,20 +27,20 @@ import javax.inject.Inject
 @SpringBootTest(classes = arrayOf(KotlinPlaygroundApplication::class), webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ManufacturerIntTest {
 
-    lateinit private var mockMvc: MockMvc
+    private lateinit var mockMvc: MockMvc
 
     @Inject
-    lateinit private var jacksonMessageConverter: MappingJackson2HttpMessageConverter
+    private lateinit var jacksonMessageConverter: MappingJackson2HttpMessageConverter
 
     @Inject
-    lateinit private var manufacturerController: ManufacturerController
+    private lateinit var manufacturerController: ManufacturerController
 
     @Inject
-    lateinit private var manufacturerRepository: ManufacturerRepository
+    private lateinit var manufacturerRepository: ManufacturerRepository
 
-    private val MANUFACTURER_URL = "$API_BASE/manufacturers"
-    private val UNKNOWN_ID = 999
-    lateinit private var testManufacturer: Manufacturer
+    private val manufacturerUrl = "$API_BASE/manufacturers"
+    private val unknownId = 999
+    private lateinit var testManufacturer: Manufacturer
 
     @Before
     fun beforeEach() {
@@ -60,7 +60,7 @@ class ManufacturerIntTest {
     @Test
     fun listAllSuccess() {
         mockMvc.perform(
-                get(MANUFACTURER_URL)
+                get(manufacturerUrl)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.length()", `is`(1)))
@@ -69,17 +69,17 @@ class ManufacturerIntTest {
     @Test
     fun listOneSuccess() {
         mockMvc.perform(
-                get("$MANUFACTURER_URL/${testManufacturer.id}")
+                get("$manufacturerUrl/${testManufacturer.id}")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk)
-                .andExpect(jsonPath("$.id", `is`(testManufacturer.id?.toInt())))
+                .andExpect(jsonPath("$.id", `is`(testManufacturer.id.toInt())))
                 .andExpect(jsonPath("$.name", `is`(testManufacturer.name)))
     }
 
     @Test
     fun listOneNotFound() {
         mockMvc.perform(
-                get("$MANUFACTURER_URL/$UNKNOWN_ID")
+                get("$manufacturerUrl/$unknownId")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isNotFound)
     }
@@ -90,7 +90,7 @@ class ManufacturerIntTest {
 
         val countBefore = manufacturerRepository.findAll().toList().size
         mockMvc.perform(
-                post(MANUFACTURER_URL)
+                post(manufacturerUrl)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(TestUtil.convertObjectToJson(newManufacturer)))
                 .andExpect(status().isCreated)
@@ -106,11 +106,11 @@ class ManufacturerIntTest {
         val updatedManufacturer = Manufacturer(name = "Updated Manufacturer")
 
         mockMvc.perform(
-                put("$MANUFACTURER_URL/${testManufacturer.id}")
+                put("$manufacturerUrl/${testManufacturer.id}")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(TestUtil.convertObjectToJson(updatedManufacturer)))
                 .andExpect(status().isOk)
-                .andExpect(jsonPath("$.id", `is`(testManufacturer.id?.toInt())))
+                .andExpect(jsonPath("$.id", `is`(testManufacturer.id.toInt())))
                 .andExpect(jsonPath("$.name", `is`(updatedManufacturer.name)))
     }
 
@@ -119,7 +119,7 @@ class ManufacturerIntTest {
         val updatedManufacturer = Manufacturer(name = "Updated Manufacturer")
 
         mockMvc.perform(
-                put("$MANUFACTURER_URL/$UNKNOWN_ID")
+                put("$manufacturerUrl/$unknownId")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(TestUtil.convertObjectToJson(updatedManufacturer)))
                 .andExpect(status().isNotFound)
@@ -129,7 +129,7 @@ class ManufacturerIntTest {
     fun deleteSuccess() {
         val countBefore = manufacturerRepository.findAll().toList().size
         mockMvc.perform(
-                delete("$MANUFACTURER_URL/${testManufacturer.id}")
+                delete("$manufacturerUrl/${testManufacturer.id}")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk)
         val countAfter = manufacturerRepository.findAll().toList().size

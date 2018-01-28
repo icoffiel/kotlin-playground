@@ -12,8 +12,8 @@ import org.springframework.test.context.junit4.SpringRunner
 
 @RunWith(SpringRunner::class)
 class ManufacturerServiceUnitTest {
-    lateinit private var manufacturerRepository: ManufacturerRepository
-    lateinit private var manufacturerService: ManufacturerService
+    private lateinit var manufacturerRepository: ManufacturerRepository
+    private lateinit var manufacturerService: ManufacturerService
 
     private val testManufacturer = Manufacturer(1, "Manufacturer Name")
 

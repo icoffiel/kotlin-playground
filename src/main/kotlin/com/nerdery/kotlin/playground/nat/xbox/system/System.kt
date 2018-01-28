@@ -9,11 +9,11 @@ import javax.persistence.Id
 data class System(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
-        val id: Long? = null,
+        val id: Long = -1,
         val name: String,
         val manufacturerId: Long
 ) {
     companion object {
-        val ExceptionName = "System"
+        const val ExceptionName = "System"
     }
 }

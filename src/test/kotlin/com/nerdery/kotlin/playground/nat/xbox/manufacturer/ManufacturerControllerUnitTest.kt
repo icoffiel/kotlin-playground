@@ -20,10 +20,10 @@ import javax.inject.Inject
 class ManufacturerControllerUnitTest {
 
     @Inject
-    lateinit private var mvc: MockMvc
+    private lateinit var mvc: MockMvc
 
     @MockBean
-    lateinit private var manufacturerService: ManufacturerService
+    private lateinit var manufacturerService: ManufacturerService
 
     private val MANUFACTURER_URL = "$API_BASE/manufacturers"
     private val testManufacturer = Manufacturer(1, "Manufacturer Name")

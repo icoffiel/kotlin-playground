@@ -28,25 +28,25 @@ import javax.inject.Inject
 @SpringBootTest(classes = arrayOf(KotlinPlaygroundApplication::class), webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class SystemIntTest {
 
-    lateinit private var mockMvc: MockMvc
+    private lateinit var mockMvc: MockMvc
 
     @Inject
-    lateinit private var jacksonMessageConverter: MappingJackson2HttpMessageConverter
+    private lateinit var jacksonMessageConverter: MappingJackson2HttpMessageConverter
 
     @Inject
-    lateinit private var systemController: SystemController
+    private lateinit var systemController: SystemController
 
     @Inject
-    lateinit private var systemRepository: SystemRepository
+    private lateinit var systemRepository: SystemRepository
 
     @Inject
-    lateinit private var manufacturerRepository: ManufacturerRepository
+    private lateinit var manufacturerRepository: ManufacturerRepository
 
-    lateinit private var testManufacturer: Manufacturer
-    lateinit private var testSystem: System
+    private lateinit var testManufacturer: Manufacturer
+    private lateinit var testSystem: System
 
-    private val SYSTEM_URL = "/api/systems"
-    private val UNKNOWN_ID = 999
+    private val systemUrl = "/api/systems"
+    private val unknownId = 999
 
     @Before
     fun beforeEach() {
@@ -57,7 +57,7 @@ class SystemIntTest {
                 .build()
 
         testManufacturer = manufacturerRepository.save(Manufacturer(name = "Test Manufacturer"))
-        testSystem = systemRepository.save(System(name = "Test System", manufacturerId = testManufacturer.id!!))
+        testSystem = systemRepository.save(System(name = "Test System", manufacturerId = testManufacturer.id))
     }
 
     @After
@@ -68,7 +68,7 @@ class SystemIntTest {
     @Test
     fun listAllSuccess() {
         mockMvc.perform(
-                get(SYSTEM_URL)
+                get(systemUrl)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.length()", `is`(1)))
@@ -77,18 +77,18 @@ class SystemIntTest {
     @Test
     fun listOneSuccess() {
         mockMvc.perform(
-                get("$SYSTEM_URL/${testSystem.id}")
+                get("$systemUrl/${testSystem.id}")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk)
-                .andExpect(jsonPath("$.system.id", `is`(testSystem.id?.toInt())))
+                .andExpect(jsonPath("$.system.id", `is`(testSystem.id.toInt())))
                 .andExpect(jsonPath("$.system.name", `is`(testSystem.name)))
-                .andExpect(jsonPath("$.manufacturerId", `is`(testManufacturer.id!!.toInt())))
+                .andExpect(jsonPath("$.manufacturerId", `is`(testManufacturer.id.toInt())))
     }
 
     @Test
     fun listOneNotFound() {
         mockMvc.perform(
-                get("$SYSTEM_URL/$UNKNOWN_ID")
+                get("$systemUrl/$unknownId")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isNotFound)
     }
@@ -96,7 +96,7 @@ class SystemIntTest {
     @Test
     fun saveSuccess() {
         val name = "New System"
-        val JSON = """
+        val json = """
             {
                 "manufacturerId": ${testManufacturer.id},
                 "system": {
@@ -107,11 +107,11 @@ class SystemIntTest {
 
         val beforeCount = systemRepository.findAll().toList().size
         mockMvc.perform(
-                post(SYSTEM_URL)
+                post(systemUrl)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(JSON))
+                        .content(json))
                 .andExpect(status().isCreated)
-                .andExpect(jsonPath("$.manufacturerId", `is`(testManufacturer.id!!.toInt())))
+                .andExpect(jsonPath("$.manufacturerId", `is`(testManufacturer.id.toInt())))
                 .andExpect(jsonPath("$.system.id", notNullValue()))
                 .andExpect(jsonPath("$.system.name", `is`(name)))
         val afterCount = systemRepository.findAll().toList().size
@@ -121,7 +121,7 @@ class SystemIntTest {
 
     @Test
     fun saveSystemFailure() {
-        val JSON = """
+        val json = """
             {
                 "system": {
                     "name": "Test System"
@@ -130,16 +130,16 @@ class SystemIntTest {
         """.trimIndent()
 
         mockMvc.perform(
-                post(SYSTEM_URL)
+                post(systemUrl)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(JSON))
+                        .content(json))
                 .andExpect(status().isBadRequest)
     }
 
     @Test
     fun updateSuccess() {
         val name = "Updated System"
-        val JSON = """
+        val json = """
             {
                 "manufacturerId": ${testManufacturer.id},
                 "system": {
@@ -149,18 +149,18 @@ class SystemIntTest {
         """.trimIndent()
 
         mockMvc.perform(
-                put("$SYSTEM_URL/${testSystem.id}")
+                put("$systemUrl/${testSystem.id}")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(JSON))
+                        .content(json))
                 .andExpect(status().isOk)
-                .andExpect(jsonPath("$.manufacturerId", `is`(testManufacturer.id!!.toInt())))
-                .andExpect(jsonPath("$.system.id", `is`(testSystem.id!!.toInt())))
+                .andExpect(jsonPath("$.manufacturerId", `is`(testManufacturer.id.toInt())))
+                .andExpect(jsonPath("$.system.id", `is`(testSystem.id.toInt())))
                 .andExpect(jsonPath("$.system.name", `is`(name)))
     }
 
     @Test
     fun updateNotFound() {
-        val JSON = """
+        val json = """
             {
                 "manufacturerId": ${testManufacturer.id},
                 "system": {
@@ -170,9 +170,9 @@ class SystemIntTest {
         """.trimIndent()
 
         mockMvc.perform(
-                put("$SYSTEM_URL/$UNKNOWN_ID")
+                put("$systemUrl/$unknownId")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(JSON))
+                        .content(json))
                 .andExpect(status().isNotFound)
     }
 
@@ -180,7 +180,7 @@ class SystemIntTest {
     fun deleteSuccess() {
         val countBefore = systemRepository.findAll().toList().size
         mockMvc.perform(
-                delete("$SYSTEM_URL/${testSystem.id}")
+                delete("$systemUrl/${testSystem.id}")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk)
         val countAfter = systemRepository.findAll().toList().size
@@ -192,7 +192,7 @@ class SystemIntTest {
     fun deleteNotFound() {
         val countBefore = systemRepository.findAll().toList().size
         mockMvc.perform(
-                delete("$SYSTEM_URL/$UNKNOWN_ID")
+                delete("$systemUrl/$unknownId")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isNotFound)
         val countAfter = systemRepository.findAll().toList().size

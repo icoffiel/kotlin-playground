@@ -9,7 +9,7 @@ import javax.persistence.Id
 data class Manufacturer(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
-        val id: Long? = null,
+        val id: Long = -1,
         val name: String
 ) {
     companion object {

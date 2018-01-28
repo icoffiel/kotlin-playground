@@ -18,7 +18,8 @@ class RestExceptionHandler {
                 ErrorResponse(
                         status = httpStatus.value().toString(),
                         title = "Resource Not Found",
-                        detail = "The ${ex.kClass} resource was not found with an Id of ${ex.id}. Please ensure that you have supplied the correct ID"),
+                        detail = "The ${ex.kClass} resource was not found with an Id of ${ex.id}." +
+                                " Please ensure that you have supplied the correct ID"),
                 httpStatus)
     }
 }
